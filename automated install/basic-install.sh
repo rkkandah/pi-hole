@@ -337,6 +337,7 @@ setDHCPCD() {
 	static domain_name_servers=${IPv4gw}" | tee -a /etc/dhcpcd.conf >/dev/null
 }
 
+
 setStaticIPv4() {
 	local IFCFG_FILE
 	local IPADDR
@@ -352,6 +353,14 @@ setStaticIPv4() {
 			echo "::: Setting IP to ${IPv4_address}.  You may need to restart after the install is complete."
 			echo ":::"
 		fi
+        elif [[ -f /etc/network/interfaces ]]; then
+                 #ubtuntu
+                if grep -q "${IPv4_address}" /etc/network/interfaces; then
+                        echo "::: Static IP already configured"
+                else
+                        echo "::: interfaces file configured with different IP than selected.  Fix that manually or restart install and use correct IP"
+                        exit 1
+                fi
 	elif [[ -f /etc/sysconfig/network-scripts/ifcfg-${piholeInterface} ]];then
 		# Fedora Family
 		IFCFG_FILE=/etc/sysconfig/network-scripts/ifcfg-${piholeInterface}
